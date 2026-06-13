@@ -226,8 +226,8 @@ Purpose: establish trust, explain the product in one line, and move users into a
 Layout:
 
 - White background with subtle turquoise radial accent near top right.
-- Centered KindX logo near upper-middle.
-- Large wordmark below logo.
+- Single large KindX logo image centered near the top.
+- Logo occupies approximately the top third of the screen and acts as the primary visual focus.
 - Slogan: "Empowering Communities Through Help"
 - Friendly short copy: "Find help nearby or support someone in your community."
 - Primary CTA: Sign Up
@@ -237,7 +237,8 @@ Layout:
 
 Visual details:
 
-- Logo sits inside a 96 px circular turquoise soft container.
+- Use the existing KindX logo asset as one large image, with no circular placeholder, duplicate wordmark, or text-only app title.
+- Keep generous white space between the logo and slogan.
 - Slogan uses 28 px bold text, centered.
 - Sign Up is turquoise primary.
 - Login is white with gray border.
@@ -691,4 +692,3 @@ Avoid:
 - Profile and chat include trust and safety cues.
 - Copy supports English first, with Portuguese localization ready.
 - All primary flows tested on small and large mobile screens.
-

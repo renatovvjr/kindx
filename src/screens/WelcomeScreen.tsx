@@ -1,17 +1,13 @@
 import React from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
-import { AppButton, LogoMark } from '../components/AppUI';
+import { AppButton } from '../components/AppUI';
 import { colors } from '../theme/colors';
 
 export default function WelcomeScreen({ navigation }: any) {
   return (
     <View style={styles.container}>
       <View style={styles.hero}>
-        <View style={styles.logoWrap}>
-          <LogoMark size={96} />
-        </View>
         <Image source={require('../../assets/logo.png')} style={styles.logoImage} resizeMode="contain" />
-        <Text style={styles.title}>KindX</Text>
         <Text style={styles.slogan}>Empowering Communities Through Help</Text>
         <Text style={styles.copy}>Find help nearby or support someone in your community.</Text>
       </View>
@@ -44,18 +40,10 @@ const styles = StyleSheet.create({
   hero: {
     alignItems: 'center',
   },
-  logoWrap: {
-    marginBottom: 18,
-  },
   logoImage: {
-    width: 118,
-    height: 44,
-    marginBottom: 4,
-  },
-  title: {
-    color: colors.textPrimary,
-    fontSize: 42,
-    fontWeight: '900',
+    width: '100%',
+    height: 250,
+    marginBottom: 42,
   },
   slogan: {
     color: colors.textPrimary,
@@ -63,7 +51,6 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     lineHeight: 34,
     textAlign: 'center',
-    marginTop: 18,
   },
   copy: {
     color: colors.textMuted,
