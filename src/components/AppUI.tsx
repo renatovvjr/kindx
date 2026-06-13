@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  Image,
   Pressable,
   StyleSheet,
   Text,
@@ -10,12 +11,18 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
 
-export function LogoMark({ size = 48 }: { size?: number }) {
+export function HeaderLogo({ height = 40 }: { height?: number }) {
   return (
-    <View style={[styles.logo, { width: size, height: size, borderRadius: size / 2 }]}>
-      <Text style={[styles.logoText, { fontSize: size * 0.36 }]}>KX</Text>
-    </View>
+    <Image
+      source={require('../../assets/logo.png')}
+      resizeMode="contain"
+      style={[styles.headerLogo, { width: height * 2.7, height }]}
+    />
   );
+}
+
+export function LogoMark({ size = 48 }: { size?: number }) {
+  return <HeaderLogo height={size} />;
 }
 
 export function Header({
@@ -38,7 +45,7 @@ export function Header({
               <Text style={styles.backButtonText}>← Back</Text>
             </Pressable>
           ) : (
-            <LogoMark size={40} />
+            <HeaderLogo height={40} />
           )}
           {right}
         </View>
@@ -167,16 +174,8 @@ export const ui = {
 };
 
 const styles = StyleSheet.create({
-  logo: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.primarySoft,
-    borderWidth: 1,
-    borderColor: '#BDEFF7',
-  },
-  logoText: {
-    color: colors.primaryDark,
-    fontWeight: '900',
+  headerLogo: {
+    alignSelf: 'flex-start',
   },
   headerSafe: {
     backgroundColor: colors.background,
