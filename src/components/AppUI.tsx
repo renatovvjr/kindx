@@ -7,6 +7,7 @@ import {
   TextInputProps,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
 
 export function LogoMark({ size = 48 }: { size?: number }) {
@@ -29,20 +30,22 @@ export function Header({
   right?: React.ReactNode;
 }) {
   return (
-    <View style={styles.header}>
-      <View style={styles.headerTop}>
-        {onBack ? (
-          <Pressable accessibilityRole="button" onPress={onBack} style={styles.iconButton}>
-            <Text style={styles.iconButtonText}>{'<'}</Text>
-          </Pressable>
-        ) : (
-          <LogoMark size={40} />
-        )}
-        {right}
+    <SafeAreaView edges={['top']} style={styles.headerSafe}>
+      <View style={styles.header}>
+        <View style={styles.headerTop}>
+          {onBack ? (
+            <Pressable accessibilityRole="button" onPress={onBack} style={styles.backButton}>
+              <Text style={styles.backButtonText}>← Back</Text>
+            </Pressable>
+          ) : (
+            <LogoMark size={40} />
+          )}
+          {right}
+        </View>
+        <Text style={styles.headerTitle}>{title}</Text>
+        {subtitle ? <Text style={styles.headerSubtitle}>{subtitle}</Text> : null}
       </View>
-      <Text style={styles.headerTitle}>{title}</Text>
-      {subtitle ? <Text style={styles.headerSubtitle}>{subtitle}</Text> : null}
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -51,11 +54,13 @@ export function AppButton({
   onPress,
   variant = 'primary',
   disabled,
+  icon,
 }: {
   label: string;
   onPress?: () => void;
   variant?: 'primary' | 'secondary' | 'orange' | 'ghost' | 'danger';
   disabled?: boolean;
+  icon?: React.ReactNode;
 }) {
   return (
     <Pressable
@@ -71,15 +76,18 @@ export function AppButton({
         disabled && styles.buttonDisabled,
       ]}
     >
-      <Text
-        style={[
-          styles.buttonText,
-          (variant === 'secondary' || variant === 'ghost') && styles.buttonTextDark,
-          variant === 'danger' && styles.buttonTextDanger,
-        ]}
-      >
-        {label}
-      </Text>
+      <View style={styles.buttonContent}>
+        {icon ? <View style={styles.buttonIcon}>{icon}</View> : null}
+        <Text
+          style={[
+            styles.buttonText,
+            (variant === 'secondary' || variant === 'ghost') && styles.buttonTextDark,
+            variant === 'danger' && styles.buttonTextDanger,
+          ]}
+        >
+          {label}
+        </Text>
+      </View>
     </Pressable>
   );
 }
@@ -170,32 +178,35 @@ const styles = StyleSheet.create({
     color: colors.primaryDark,
     fontWeight: '900',
   },
+  headerSafe: {
+    backgroundColor: colors.background,
+  },
   header: {
     paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 12,
+    paddingTop: 14,
+    paddingBottom: 14,
   },
   headerTop: {
     minHeight: 44,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 12,
+    marginBottom: 16,
   },
-  iconButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+  backButton: {
+    minHeight: 44,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.surface,
+    paddingHorizontal: 16,
+    backgroundColor: colors.primarySoft,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: colors.primary,
   },
-  iconButtonText: {
-    color: colors.textPrimary,
-    fontSize: 22,
-    fontWeight: '800',
+  backButtonText: {
+    color: colors.primary,
+    fontSize: 16,
+    fontWeight: '900',
   },
   headerTitle: {
     color: colors.textPrimary,
@@ -216,6 +227,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 16,
     backgroundColor: colors.primary,
+  },
+  buttonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  buttonIcon: {
+    width: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 10,
   },
   buttonSecondary: {
     backgroundColor: colors.white,

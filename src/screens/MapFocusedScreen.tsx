@@ -1,6 +1,7 @@
 import React from 'react';
 import { Platform, Pressable, StyleSheet, Text, View, Alert, Linking } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppButton, Pill } from '../components/AppUI';
 import { colors } from '../theme/colors';
 
@@ -42,9 +43,11 @@ export default function MapFocusedScreen({ route, navigation }: any) {
         />
       </MapView>
 
-      <Pressable style={styles.back} onPress={() => navigation.goBack()}>
-        <Text style={styles.backText}>{'<'}</Text>
-      </Pressable>
+      <SafeAreaView edges={['top']} style={styles.topNav}>
+        <Pressable accessibilityRole="button" style={styles.back} onPress={() => navigation.goBack()}>
+          <Text style={styles.backText}>← Back</Text>
+        </Pressable>
+      </SafeAreaView>
 
       <View style={styles.sheet}>
         <Pill label={item.type === 'request' ? 'Request' : 'Offer'} tone={item.type === 'request' ? 'orange' : 'success'} />
@@ -64,22 +67,28 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   back: {
-    position: 'absolute',
-    top: 52,
-    left: 20,
-    width: 46,
-    height: 46,
-    borderRadius: 23,
+    minHeight: 44,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.card,
+    alignSelf: 'flex-start',
+    paddingHorizontal: 16,
+    backgroundColor: colors.primarySoft,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: colors.primary,
   },
   backText: {
-    color: colors.textPrimary,
-    fontSize: 22,
+    color: colors.primary,
+    fontSize: 16,
     fontWeight: '900',
+  },
+  topNav: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    paddingHorizontal: 20,
+    paddingTop: 14,
   },
   sheet: {
     position: 'absolute',

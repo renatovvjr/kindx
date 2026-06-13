@@ -1,4 +1,5 @@
 import React from 'react';
+import { FontAwesome } from '@expo/vector-icons';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { AppButton } from '../components/AppUI';
 import { colors } from '../theme/colors';
@@ -16,8 +17,18 @@ export default function WelcomeScreen({ navigation }: any) {
         <AppButton label="Sign Up" onPress={() => navigation.navigate('Login', { mode: 'signup' })} />
         <AppButton label="Login" variant="secondary" onPress={() => navigation.navigate('Login')} />
         <View style={styles.socialRow}>
-          <AppButton label="Continue with Google" variant="secondary" onPress={() => navigation.navigate('Tabs')} />
-          <AppButton label="Continue with Apple" variant="secondary" onPress={() => navigation.navigate('Tabs')} />
+          <AppButton
+            label="Continue with Google"
+            variant="secondary"
+            icon={<FontAwesome name="google" size={18} color="#4285F4" />}
+            onPress={() => navigation.navigate('Tabs')}
+          />
+          <AppButton
+            label="Continue with Apple"
+            variant="secondary"
+            icon={<FontAwesome name="apple" size={21} color="#111827" />}
+            onPress={() => navigation.navigate('Tabs')}
+          />
         </View>
       </View>
 

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { FontAwesome } from '@expo/vector-icons';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { AppButton, Field, Header } from '../components/AppUI';
 import { colors } from '../theme/colors';
@@ -61,8 +62,18 @@ export default function LoginScreen({ navigation, route }: any) {
           <View style={styles.divider} />
         </View>
 
-        <AppButton label="Continue with Google" variant="secondary" onPress={() => navigation.replace('Tabs')} />
-        <AppButton label="Continue with Apple" variant="secondary" onPress={() => navigation.replace('Tabs')} />
+        <AppButton
+          label="Continue with Google"
+          variant="secondary"
+          icon={<FontAwesome name="google" size={18} color="#4285F4" />}
+          onPress={() => navigation.replace('Tabs')}
+        />
+        <AppButton
+          label="Continue with Apple"
+          variant="secondary"
+          icon={<FontAwesome name="apple" size={21} color="#111827" />}
+          onPress={() => navigation.replace('Tabs')}
+        />
       </View>
 
       <Pressable onPress={() => setMode(isSignup ? 'login' : 'signup')} style={styles.switcher}>
