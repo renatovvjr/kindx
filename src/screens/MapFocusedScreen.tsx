@@ -1,14 +1,8 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-  Platform,
-  Alert,
-  Linking,
-} from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, View, Alert, Linking } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
+import { AppButton, Pill } from '../components/AppUI';
+import { colors } from '../theme/colors';
 
 export default function MapFocusedScreen({ route, navigation }: any) {
   const { item } = route.params;
@@ -16,39 +10,25 @@ export default function MapFocusedScreen({ route, navigation }: any) {
   const region = {
     latitude: item.latitude,
     longitude: item.longitude,
-    latitudeDelta: 0.01,
-    longitudeDelta: 0.01,
+    latitudeDelta: 0.018,
+    longitudeDelta: 0.018,
   };
 
-  const handleOpenRoute = async () => {
+  const openRoute = async () => {
+    const url =
+      Platform.OS === 'ios'
+        ? `http://maps.apple.com/?daddr=${item.latitude},${item.longitude}`
+        : `https://www.google.com/maps/dir/?api=1&destination=${item.latitude},${item.longitude}`;
+
     try {
-      const lat = item.latitude;
-      const lng = item.longitude;
-
-      let url = '';
-
-      if (Platform.OS === 'ios') {
-        // Abre no Apple Maps
-        url = `http://maps.apple.com/?daddr=${lat},${lng}`;
-      } else {
-        // Abre no Google Maps (Android)
-        url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
-      }
-
       const supported = await Linking.canOpenURL(url);
-
       if (!supported) {
-        Alert.alert(
-          'Não foi possível abrir o mapa',
-          'Seu dispositivo não conseguiu abrir um app de mapas para traçar a rota.'
-        );
+        Alert.alert('Map unavailable', 'Your device could not open a maps app.');
         return;
       }
-
       await Linking.openURL(url);
     } catch (error) {
-      console.log('Erro ao abrir rota:', error);
-      Alert.alert('Erro', 'Ocorreu um erro ao tentar abrir a rota.');
+      Alert.alert('Map unavailable', 'There was a problem opening directions.');
     }
   };
 
@@ -57,68 +37,70 @@ export default function MapFocusedScreen({ route, navigation }: any) {
       <MapView style={styles.map} initialRegion={region}>
         <Marker
           coordinate={{ latitude: item.latitude, longitude: item.longitude }}
-          pinColor={item.type === 'request' ? '#F97316' : '#059669'}
+          pinColor={item.type === 'request' ? colors.secondary : colors.success}
+          title={item.title}
         />
       </MapView>
 
-      <View style={styles.footer}>
-        <Pressable style={styles.backBtn} onPress={() => navigation.goBack()}>
-          <Text style={styles.backText}>← Voltar</Text>
-        </Pressable>
+      <Pressable style={styles.back} onPress={() => navigation.goBack()}>
+        <Text style={styles.backText}>{'<'}</Text>
+      </Pressable>
 
-        <Text style={styles.title}>
-          {item.type === 'request' ? 'Pedido de Ajuda' : 'Oferta de Ajuda'}
-        </Text>
-
-        <Text style={styles.subtitle}>{item.title}</Text>
-
-        <Pressable style={styles.routeBtn} onPress={handleOpenRoute}>
-          <Text style={styles.routeText}>Traçar rota no mapa</Text>
-        </Pressable>
+      <View style={styles.sheet}>
+        <Pill label={item.type === 'request' ? 'Request' : 'Offer'} tone={item.type === 'request' ? 'orange' : 'success'} />
+        <Text style={styles.title}>{item.title}</Text>
+        <Text style={styles.copy}>{item.location} - {item.distance || 'nearby'}</Text>
+        <AppButton label="Open Directions" onPress={openRoute} />
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  map: { flex: 1 },
-  footer: {
-    padding: 20,
-    backgroundColor: '#FFF',
-    borderTopWidth: 1,
-    borderColor: '#EEE',
+  container: {
+    flex: 1,
   },
-  backBtn: {
-    marginBottom: 10,
+  map: {
+    flex: 1,
+  },
+  back: {
+    position: 'absolute',
+    top: 52,
+    left: 20,
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.card,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   backText: {
-    color: '#00B8D9',
-    fontSize: 16,
-    fontWeight: '700',
+    color: colors.textPrimary,
+    fontSize: 22,
+    fontWeight: '900',
+  },
+  sheet: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    padding: 20,
+    paddingBottom: 34,
+    backgroundColor: colors.card,
   },
   title: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: '#111',
+    color: colors.textPrimary,
+    fontSize: 22,
+    fontWeight: '900',
+    marginTop: 12,
   },
-  subtitle: {
-    fontSize: 15,
-    color: '#444',
-    marginBottom: 20,
-  },
-  routeBtn: {
-    backgroundColor: '#00B8D9',
-    padding: 14,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginBottom: 28, 
-  },
-  routeText: {
-    color: '#FFF',
-    fontSize: 16,
-    fontWeight: '700',
+  copy: {
+    color: colors.textMuted,
+    marginTop: 6,
+    marginBottom: 18,
   },
 });
-
-

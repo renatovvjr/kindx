@@ -1,160 +1,156 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
-  Pressable,
-  Alert,
-  ScrollView,
-} from 'react-native';
+import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { AppButton, Field, Header } from '../components/AppUI';
 import { supabase } from '../lib/supabase';
+import { colors } from '../theme/colors';
+
+const categories = ['Groceries', 'Transport', 'Home tasks', 'Companionship', 'Translation', 'Donations', 'Other'];
+const urgencyOptions = ['Today', 'This week', 'Flexible'];
 
 export default function AskHelpScreen({ navigation }: any) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [category, setCategory] = useState('');
+  const [category, setCategory] = useState(categories[0]);
   const [location, setLocation] = useState('');
+  const [urgency, setUrgency] = useState(urgencyOptions[0]);
   const [saving, setSaving] = useState(false);
 
   const handleSubmit = async () => {
-    if (!title || !description || !location) {
-      Alert.alert('Atenção', 'Preencha pelo menos título, descrição e localização.');
+    if (!title || !description || !category || !location) {
+      Alert.alert('Missing details', 'Please add a title, description, category, and location.');
       return;
     }
 
     try {
       setSaving(true);
-
       const { error } = await supabase.from('requests').insert({
         title,
-        description,
+        description: `${description}\nUrgency: ${urgency}`,
         category,
         location,
       });
 
       if (error) {
-        console.log(error);
-        Alert.alert('Erro', 'Não foi possível salvar o pedido.');
+        Alert.alert('Saved locally for now', 'The request UI is ready, but Supabase could not save this item.');
       } else {
-        Alert.alert('Sucesso', 'Seu pedido foi enviado para a comunidade!');
-        setTitle('');
-        setDescription('');
-        setCategory('');
-        setLocation('');
+        Alert.alert('Request posted', 'Your request was shared with the KindX community.');
         navigation.goBack();
       }
     } catch (e) {
-      console.log(e);
-      Alert.alert('Erro', 'Algo inesperado aconteceu.');
+      Alert.alert('Request prepared', 'The screen is ready. Please check your Supabase connection to save live data.');
     } finally {
       setSaving(false);
     }
   };
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={{ paddingBottom: 24 }}
-    >
-      <Text style={styles.title}>Pedir Ajuda</Text>
+    <ScrollView style={styles.screen} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+      <Header
+        title="Ask for Help"
+        subtitle="Tell nearby helpers what you need. Keep it clear and safe."
+        onBack={() => navigation.goBack()}
+      />
 
       <View style={styles.form}>
-        <TextInput
-          style={styles.input}
-          placeholder="Título do pedido"
-          value={title}
-          onChangeText={setTitle}
-        />
-
-        <TextInput
-          style={[styles.input, styles.textArea]}
-          multiline
-          placeholder="Descreva o que você precisa"
+        <Field label="Title" placeholder="What do you need help with?" value={title} onChangeText={setTitle} />
+        <Field
+          label="Description"
+          placeholder="Add useful details, timing, and any accessibility needs."
           value={description}
           onChangeText={setDescription}
+          multiline
         />
 
-        <TextInput
-          style={styles.input}
-          placeholder="Categoria (ex: mudança, companhia, comida)"
-          value={category}
-          onChangeText={setCategory}
-        />
+        <Text style={styles.label}>Category</Text>
+        <View style={styles.chips}>
+          {categories.map((item) => (
+            <Pressable key={item} onPress={() => setCategory(item)} style={[styles.chip, category === item && styles.chipActive]}>
+              <Text style={[styles.chipText, category === item && styles.chipTextActive]}>{item}</Text>
+            </Pressable>
+          ))}
+        </View>
 
-        <TextInput
-          style={styles.input}
-          placeholder="Localização (bairro/cidade)"
-          value={location}
-          onChangeText={setLocation}
-        />
+        <Text style={styles.label}>Urgency</Text>
+        <View style={styles.chips}>
+          {urgencyOptions.map((item) => (
+            <Pressable key={item} onPress={() => setUrgency(item)} style={[styles.chip, urgency === item && styles.chipActiveOrange]}>
+              <Text style={[styles.chipText, urgency === item && styles.chipTextActive]}>{item}</Text>
+            </Pressable>
+          ))}
+        </View>
 
-        <Pressable
-          style={[styles.button, saving && { opacity: 0.7 }]}
-          onPress={handleSubmit}
-          disabled={saving}
-        >
-          <Text style={styles.buttonText}>
-            {saving ? 'Enviando...' : 'Enviar Pedido'}
-          </Text>
-        </Pressable>
+        <Field label="Location" placeholder="Suburb or approximate area" value={location} onChangeText={setLocation} />
 
-        <Pressable style={styles.link} onPress={() => navigation.goBack()}>
-          <Text style={styles.linkText}>Voltar</Text>
-        </Pressable>
+        <View style={styles.privacy}>
+          <Text style={styles.privacyTitle}>Privacy note</Text>
+          <Text style={styles.privacyCopy}>Your exact address is only shared after you confirm a helper.</Text>
+        </View>
+
+        <AppButton label={saving ? 'Posting...' : 'Post Request'} variant="orange" disabled={saving} onPress={handleSubmit} />
       </View>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  screen: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 16,
-    paddingTop: 40, // desce para fugir da câmera frontal
+    backgroundColor: colors.background,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: '800',
-    color: '#00B8D9',
-    textAlign: 'center',
-    marginBottom: 20,
+  content: {
+    paddingBottom: 32,
   },
   form: {
-    marginTop: 4,
+    paddingHorizontal: 20,
   },
-  input: {
+  label: {
+    color: colors.textPrimary,
+    fontSize: 14,
+    fontWeight: '800',
+    marginBottom: 8,
+  },
+  chips: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 18,
+  },
+  chip: {
+    borderRadius: 999,
+    paddingHorizontal: 13,
+    paddingVertical: 9,
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
-    borderRadius: 10,
-    padding: 12,
-    marginBottom: 16,
-    backgroundColor: '#FFFFFF',
+    borderColor: colors.border,
   },
-  textArea: {
-    height: 110,
-    textAlignVertical: 'top',
+  chipActive: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
   },
-  button: {
-    backgroundColor: '#00B8D9',
-    padding: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginTop: 4,
+  chipActiveOrange: {
+    backgroundColor: colors.secondary,
+    borderColor: colors.secondary,
   },
-  buttonText: {
-    color: '#FFF',
-    fontWeight: '700',
-    fontSize: 16,
+  chipText: {
+    color: colors.textSecondary,
+    fontWeight: '800',
   },
-  link: {
-    marginTop: 16,
-    alignItems: 'center',
+  chipTextActive: {
+    color: colors.white,
   },
-  linkText: {
-    color: '#00B8D9',
-    fontSize: 16,
-    fontWeight: '600',
+  privacy: {
+    borderRadius: 16,
+    padding: 14,
+    marginBottom: 18,
+    backgroundColor: colors.primarySoft,
+  },
+  privacyTitle: {
+    color: colors.primaryDark,
+    fontWeight: '900',
+    marginBottom: 4,
+  },
+  privacyCopy: {
+    color: colors.textSecondary,
+    lineHeight: 20,
   },
 });

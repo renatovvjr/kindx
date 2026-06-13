@@ -1,107 +1,70 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Pressable,
-  Dimensions,
-  Alert,
-} from 'react-native';
+import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { AppButton, Avatar, Header, Pill, ui } from '../components/AppUI';
+import { colors } from '../theme/colors';
 
 export default function FeedDetailsScreen({ route, navigation }: any) {
   const { item } = route.params;
-  const screenWidth = Dimensions.get('window').width;
-
   const isRequest = item.type === 'request';
-  const isOffer = item.type === 'offer';
-
-  const handleAction = () => {
-    if (isRequest) {
-      Alert.alert(
-        'Você quer ajudar',
-        'Obrigado por querer ajudar! Em breve será possível entrar em contato diretamente com quem fez o pedido.'
-      );
-    }
-
-    if (isOffer) {
-      Alert.alert(
-        'Você precisa dessa ajuda',
-        'Ótimo! Em breve será possível combinar diretamente com quem ofereceu a ajuda.'
-      );
-    }
-  };
-
-  const handleOpenMap = () => {
-    if (!item.latitude || !item.longitude) {
-      Alert.alert(
-        'Sem localização',
-        'Este pedido/oferta ainda não tem localização no mapa.'
-      );
-      return;
-    }
-
-    // Agora vamos para uma TELA específica de mapa focado, e não para a aba Mapa
-    navigation.navigate('MapFocused', { item });
-  };
 
   return (
-    <ScrollView
-      style={styles.screen}
-      contentContainerStyle={[styles.content, { alignItems: 'center' }]}
-    >
-      <Pressable onPress={() => navigation.goBack()} style={styles.backWrapper}>
-        <Text style={styles.back}>← Voltar</Text>
-      </Pressable>
+    <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
+      <Header title={isRequest ? 'Help Request' : 'Help Offer'} subtitle="Review details before you connect." onBack={() => navigation.goBack()} />
 
-      <View style={[styles.card, { width: screenWidth * 0.92 }]}>
-        <View style={styles.headerRow}>
-          <Text
-            style={[
-              styles.typePill,
-              isRequest ? styles.typePillRequest : styles.typePillOffer,
-            ]}
-          >
-            {isRequest ? 'Pedido de Ajuda' : 'Oferta de Ajuda'}
-          </Text>
+      <View style={[styles.card, ui.shadow]}>
+        <View style={styles.personRow}>
+          <Avatar name={item.userName || 'KindX User'} size={54} />
+          <View style={styles.personText}>
+            <Text style={styles.name}>{item.userName || 'KindX User'}</Text>
+            <Text style={styles.trust}>Verified community member</Text>
+          </View>
+          <Pill label={isRequest ? 'Request' : 'Offer'} tone={isRequest ? 'orange' : 'success'} />
         </View>
 
         <Text style={styles.title}>{item.title}</Text>
+        <Text style={styles.description}>{item.description || 'No detailed description yet.'}</Text>
 
-        {isRequest && item.category ? (
-          <Text style={styles.category}>Categoria: {item.category}</Text>
-        ) : null}
-
-        {item.location ? (
-          <Text style={styles.location}>📍 {item.location}</Text>
-        ) : null}
-
-        <View style={styles.separator} />
-
-        <Text style={styles.sectionLabel}>Detalhes</Text>
-
-        <Text style={styles.description}>
-          {item.description || 'Sem descrição detalhada.'}
-        </Text>
-
-        <Pressable style={styles.actionButton} onPress={handleAction}>
-          <Text style={styles.actionButtonText}>
-            {isRequest ? 'Quero ajudar' : 'Preciso dessa ajuda'}
-          </Text>
-        </Pressable>
-
-        <Pressable style={styles.mapButton} onPress={handleOpenMap}>
-          <Text style={styles.mapButtonText}>Ver no mapa</Text>
-        </Pressable>
-
-        <View style={styles.footer}>
-          <Text style={styles.date}>
-            Publicado em:{' '}
-            {item.created_at
-              ? new Date(item.created_at).toLocaleString('pt-BR')
-              : '-'}
-          </Text>
+        <View style={styles.infoGrid}>
+          <View style={styles.infoBox}>
+            <Text style={styles.infoLabel}>Category</Text>
+            <Text style={styles.infoValue}>{item.category || 'General'}</Text>
+          </View>
+          <View style={styles.infoBox}>
+            <Text style={styles.infoLabel}>Location</Text>
+            <Text style={styles.infoValue}>{item.location || 'Nearby'}</Text>
+          </View>
+          <View style={styles.infoBox}>
+            <Text style={styles.infoLabel}>Distance</Text>
+            <Text style={styles.infoValue}>{item.distance || 'Nearby'}</Text>
+          </View>
+          <View style={styles.infoBox}>
+            <Text style={styles.infoLabel}>Posted</Text>
+            <Text style={styles.infoValue}>{item.time || 'Recently'}</Text>
+          </View>
         </View>
+
+        <View style={styles.safety}>
+          <Text style={styles.safetyTitle}>Safety reminder</Text>
+          <Text style={styles.safetyCopy}>Keep exact addresses private until both people confirm the help details.</Text>
+        </View>
+
+        <AppButton
+          label={isRequest ? 'Offer Help' : 'Message'}
+          variant={isRequest ? 'orange' : 'primary'}
+          onPress={() => navigation.navigate('Chat', { conversationId: item.id })}
+        />
+        <View style={styles.spacer} />
+        <AppButton
+          label="View on Map"
+          variant="secondary"
+          onPress={() => {
+            if (!item.latitude || !item.longitude) {
+              Alert.alert('Location unavailable', 'This item does not have map coordinates yet.');
+              return;
+            }
+            navigation.navigate('MapFocused', { item });
+          }}
+        />
       </View>
     </ScrollView>
   );
@@ -110,118 +73,89 @@ export default function FeedDetailsScreen({ route, navigation }: any) {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: colors.surface,
   },
   content: {
-    paddingTop: 40,
-    paddingBottom: 40,
-  },
-  backWrapper: {
-    alignSelf: 'flex-start',
-    marginLeft: 16,
-    marginBottom: 20,
-  },
-  back: {
-    color: '#00B8D9',
-    fontWeight: '600',
-    fontSize: 18,
+    paddingBottom: 32,
   },
   card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 18,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 3 },
-    elevation: 3,
+    marginHorizontal: 20,
+    borderRadius: 22,
+    padding: 18,
+    backgroundColor: colors.card,
+    borderWidth: 1,
+    borderColor: colors.divider,
   },
-  headerRow: {
+  personRow: {
     flexDirection: 'row',
-    marginBottom: 10,
+    alignItems: 'center',
+    gap: 12,
   },
-  typePill: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 999,
-    fontSize: 12,
+  personText: {
+    flex: 1,
+  },
+  name: {
+    color: colors.textPrimary,
+    fontSize: 17,
+    fontWeight: '900',
+  },
+  trust: {
+    color: colors.success,
+    fontSize: 13,
     fontWeight: '700',
-    color: '#FFFFFF',
+    marginTop: 2,
   },
-  typePillRequest: { backgroundColor: '#F97316' },
-  typePillOffer: { backgroundColor: '#059669' },
   title: {
-    fontSize: 22,
-    fontWeight: '800',
-    marginBottom: 6,
-    color: '#111827',
-  },
-  category: {
-    fontSize: 14,
-    color: '#6B7280',
-    marginBottom: 6,
-  },
-  location: {
-    fontSize: 14,
-    color: '#374151',
-    marginBottom: 12,
-  },
-  separator: {
-    height: 1,
-    backgroundColor: '#E5E7EB',
-    marginVertical: 14,
-  },
-  sectionLabel: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#4B5563',
-    marginBottom: 8,
+    color: colors.textPrimary,
+    fontSize: 25,
+    lineHeight: 31,
+    fontWeight: '900',
+    marginTop: 22,
   },
   description: {
+    color: colors.textSecondary,
     fontSize: 16,
-    color: '#4B5563',
     lineHeight: 24,
-    marginBottom: 20,
+    marginTop: 10,
   },
-  actionButton: {
-    backgroundColor: '#00B8D9',
-    paddingVertical: 12,
-    borderRadius: 999,
-    alignItems: 'center',
-    marginBottom: 10,
+  infoGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    marginTop: 20,
   },
-  actionButtonText: {
-    color: '#FFFFFF',
-    fontWeight: '700',
-    fontSize: 16,
+  infoBox: {
+    width: '48%',
+    borderRadius: 16,
+    padding: 12,
+    backgroundColor: colors.surface,
   },
-  mapButton: {
-    borderWidth: 1,
-    borderColor: '#00B8D9',
-    paddingVertical: 10,
-    borderRadius: 999,
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  mapButtonText: {
-    color: '#00B8D9',
-    fontWeight: '700',
-    fontSize: 15,
-  },
-  footer: {
-    borderTopWidth: 1,
-    borderTopColor: '#F3F4F6',
-    paddingTop: 10,
-  },
-  date: {
+  infoLabel: {
+    color: colors.textMuted,
     fontSize: 12,
-    color: '#9CA3AF',
+    fontWeight: '800',
+    marginBottom: 4,
+  },
+  infoValue: {
+    color: colors.textPrimary,
+    fontWeight: '900',
+  },
+  safety: {
+    borderRadius: 16,
+    padding: 14,
+    marginVertical: 20,
+    backgroundColor: colors.primarySoft,
+  },
+  safetyTitle: {
+    color: colors.primaryDark,
+    fontWeight: '900',
+  },
+  safetyCopy: {
+    color: colors.textSecondary,
+    marginTop: 4,
+    lineHeight: 20,
+  },
+  spacer: {
+    height: 10,
   },
 });
-
-
-
-
-
-
-

@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import LoginScreen from './src/screens/LoginScreen';
+import WelcomeScreen from './src/screens/WelcomeScreen';
 import HomeScreen from './src/screens/HomeScreen';
 import AskHelpScreen from './src/screens/AskHelpScreen';
 import OfferHelpScreen from './src/screens/OfferHelpScreen';
@@ -11,16 +12,35 @@ import FeedScreen from './src/screens/FeedScreen';
 import FeedDetailsScreen from './src/screens/FeedDetailsScreen';
 import MapScreen from './src/screens/MapScreen';
 import MapFocusedScreen from './src/screens/MapFocusedScreen';
+import ProfileScreen from './src/screens/ProfileScreen';
+import ChatScreen from './src/screens/ChatScreen';
+import NotificationsScreen from './src/screens/NotificationsScreen';
+import SettingsScreen from './src/screens/SettingsScreen';
 
 const Stack = createNativeStackNavigator();
 const Tabs = createBottomTabNavigator();
 
 function TabsNavigator() {
   return (
-    <Tabs.Navigator screenOptions={{ headerShown: false }}>
+    <Tabs.Navigator
+      screenOptions={{
+        headerShown: false,
+        tabBarActiveTintColor: '#00B8D9',
+        tabBarInactiveTintColor: '#6B7280',
+        tabBarLabelStyle: { fontSize: 12, fontWeight: '700' },
+        tabBarStyle: {
+          height: 72,
+          paddingTop: 8,
+          paddingBottom: 10,
+          borderTopColor: '#EEF2F7',
+          backgroundColor: '#FFFFFF',
+        },
+      }}
+    >
       <Tabs.Screen name="Home" component={HomeScreen} />
       <Tabs.Screen name="Feed" component={FeedScreen} />
-      <Tabs.Screen name="Mapa" component={MapScreen} />
+      <Tabs.Screen name="Map" component={MapScreen} />
+      <Tabs.Screen name="Profile" component={ProfileScreen} />
     </Tabs.Navigator>
   );
 }
@@ -29,12 +49,16 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Welcome" component={WelcomeScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Tabs" component={TabsNavigator} />
         <Stack.Screen name="AskHelp" component={AskHelpScreen} />
         <Stack.Screen name="OfferHelp" component={OfferHelpScreen} />
         <Stack.Screen name="FeedDetails" component={FeedDetailsScreen} />
         <Stack.Screen name="MapFocused" component={MapFocusedScreen} />
+        <Stack.Screen name="Chat" component={ChatScreen} />
+        <Stack.Screen name="Notifications" component={NotificationsScreen} />
+        <Stack.Screen name="Settings" component={SettingsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
